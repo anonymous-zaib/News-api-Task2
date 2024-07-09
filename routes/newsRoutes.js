@@ -279,4 +279,24 @@ router.get('/reports', adminAuth, async (req, res) => {
         res.status(500).send({ error: 'Server error' });
     }
 });
+
+router.post('/sharepost/:postId', auth, async (req, res) => {
+    try {
+        const post = await News.findById(req.params.postId);
+        if (!post) {
+            return res.status(404).send({ error: 'Post not found' });
+        }
+
+        // Increase the share count
+        post.shares = post.shares ? post.shares + 1 : 1;
+        await post.save();
+
+        // Generate a shareable link with a query parameter
+        const shareableLink = `${req.protocol}://${req.get('host')}/news/${post._id}?sharedBy=${req.user._id}`;
+
+        res.status(200).send({ message: 'Post shared successfully', shareableLink });
+    } catch (err) {
+        res.status(500).send({ error: 'Server error' });
+    }
+});
 module.exports = router

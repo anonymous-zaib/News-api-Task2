@@ -65,6 +65,10 @@ const newsSchema = new mongoose.Schema({
         type: String,
         default: '',
     },
+    shares: {
+        type: Number,
+        default: 0,
+    },
 },{
     timestamps: true
 })
