@@ -8,23 +8,6 @@ const auth = require('../middlewares/auth')
 const { upload, uploadToFirebase } = require('../middlewares/multer');
 const router = express.Router();
 
-// Create News
-// router.post('/createnews', adminAuth, upload.single('newsImage'), async (req, res) => {
-//     try {
-//       const { title, content, category } = req.body;
-//       const newsPost = new News({
-//         title,
-//         content,
-//         category,
-//         author: req.user._id,
-//         image: req.file ? `/uploads/${req.file.filename}` : null,
-//       });
-//       await newsPost.save();
-//       res.status(201).send({ newsPost, message: 'News post created successfully' });
-//     } catch (err) {
-//       res.status(400).send({ error: err });
-//     }
-//   });
 
 router.post('/createnews', adminAuth, upload.single('newsImage'), async (req, res) => {
     try {
