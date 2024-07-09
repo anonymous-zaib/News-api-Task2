@@ -6,11 +6,6 @@ const auth = require('../middlewares/auth');
 const News = require('../models/News');
 const { upload, uploadToFirebase } = require('../middlewares/multer');
 const router = express.Router();
-// const admin = require("./config/firebase");
-
-// const storage = multer.memoryStorage();
-// const upload = multer({ storage });
-// const bucket = admin.storage().bucket()
 
 router.get('/', (req, res) => {
     res.send({
@@ -95,7 +90,7 @@ router.post('/admin/login', async (req, res) => {
 // profile route
 router.get('/profile', auth, async (req, res) => {
     try {
-        const user = await User.findById(req.user._id).select('name email');
+        const user = await User.findById(req.user._id).select('profilePicture name email');
         res.send(user);
     } catch (err) {
         res.status(500).send({ error: 'Server error' });
@@ -118,26 +113,60 @@ router.patch('/profile/picture', auth, upload.single('profilePicture'), async (r
     }
   });
   
-// Update User Profile
-router.patch('/profile', auth, async (req, res) => {
+  router.patch('/updateprofile', auth, async (req, res) => {
     const updates = Object.keys(req.body);
-    const allowedUpdates = ['name', 'email', 'password'];
+    const allowedUpdates = ['name', 'email', 'password']; // Include password if you want to allow password updates
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
+  
     if (!isValidOperation) {
       return res.status(400).send({ error: 'Invalid updates!' });
     }
+  
     try {
-      updates.forEach((update) => (req.user[update] = req.body[update]));
+      const user = req.user;
+  
+      updates.forEach((update) => {
+        if (update !== 'password') {
+          user[update] = req.body[update];
+        }
+      });
+  
       if (req.body.password) {
-        req.user.password = await bcrypt.hash(req.user.password, 8);
+        user.password = await bcrypt.hash(req.body.password, 8);
       }
-      await req.user.save();
-      const updatedUser = await User.findById(req.user._id).select('name email profilePicture');
+  
+      await user.save();
+  
+      const updatedUser = await User.findById(user._id).select('name email profilePicture');
       res.send(updatedUser);
     } catch (err) {
-      res.status(400).send(err);
+      res.status(400).send({ error: err.message });
     }
   });
+  // Delete User Profile
+router.delete('/profile/:id', auth, async (req, res) => {
+    const userId = req.params.id;
+
+    try {
+        // Verify if the authenticated user ID matches the requested user ID
+        if (req.user._id.toString() !== userId) {
+            return res.status(403).send({ error: 'Unauthorized' });
+        }
+
+        const user = await User.findOneAndDelete({
+            _id: userId
+        });
+
+        if (!user) {
+            return res.status(404).send({ error: 'User not found' });
+        }
+
+        res.send({ message: 'User deleted successfully' });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send({ error: 'Server error' });
+    }
+});
 
 // Delete User Profile
 router.delete('/newspost/:postId/comment/:commentId', auth, async (req, res) => {

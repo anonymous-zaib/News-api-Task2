@@ -29,7 +29,11 @@ const router = express.Router();
 router.post('/createnews', adminAuth, upload.single('newsImage'), async (req, res) => {
     try {
       const { title, content, category } = req.body;
+  
+      // Upload the image to Firebase if it exists
       const publicUrl = req.file ? await uploadToFirebase(req.file) : null;
+  
+      // Create the news post
       const newsPost = new News({
         title,
         content,
@@ -37,10 +41,12 @@ router.post('/createnews', adminAuth, upload.single('newsImage'), async (req, re
         author: req.user._id,
         image: publicUrl,
       });
+  
       await newsPost.save();
+  
       res.status(201).send({ newsPost, message: 'News post created successfully' });
     } catch (err) {
-      res.status(400).send({ error: err });
+      res.status(400).send({ error: err.message });
     }
   });
 
