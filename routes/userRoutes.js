@@ -102,19 +102,6 @@ router.get('/profile', auth, async (req, res) => {
     }
 });
 
-// router.patch('/profile/picture', auth, upload.single('profilePicture'), async (req, res) => {
-//     if (!req.file) {
-//       return res.status(400).send({ error: 'No file uploaded' });
-//     }
-//     try {
-//       req.user.profilePicture = `gs://newsapi-b3ca9.appspot.com/${req.file.filename}`;
-//       await req.user.save();
-//       res.send({ message: 'Profile picture updated', profilePicture: req.user.profilePicture });
-//     } catch (err) {
-//       res.status(500).send({ error: 'Server error' });
-//     }
-//   });
-
 // Update User Profile Picture
 router.patch('/profile/picture', auth, upload.single('profilePicture'), async (req, res) => {
     if (!req.file) {
@@ -130,36 +117,6 @@ router.patch('/profile/picture', auth, upload.single('profilePicture'), async (r
       res.status(500).send({ error: 'Server error' });
     }
   });
-
-// router.patch("/profile/picture", upload.single("file"), async (req, res) => {
-//     if (req.file) {
-//       try {
-//         const blob = bucket.file(req.file.originalname);
-//         const blobStream = blob.createWriteStream({
-//           metadata: {
-//             contentType: req.file.mimetype
-//           }
-//         });
-//         blobStream.on('error', (err) => {
-//           res.status(500).send({ message: "Uploading File: " + err.message });
-//         });
-    
-//         blobStream.on('finish', async () => {
-//           await blob.makePublic();
-//           const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-//           res.status(200).json({ msg: "success", data: publicUrl });
-//         });
-    
-//         blobStream.end(req.file.buffer);
-//       } catch (error) {
-//         res.status(500).json({ msg: "failed", errors: [{ msg: "There is no file" }] });
-//       }
-//     } else {
-//       res
-//         .status(400)
-//         .json({ msg: "failed", errors: [{ msg: "There is no file" }] });
-//     }
-//   });
   
 // Update User Profile
 router.patch('/profile', auth, async (req, res) => {
