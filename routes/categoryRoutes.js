@@ -17,7 +17,7 @@ router.post('/createcategory', adminAuth, async (req, res) => {
 });
 
 // Read all categories
-router.get('/getcategory', async (req, res) => {
+router.get('/getcategories', async (req, res) => {
     try {
         const categories = await Category.find();
         res.send(categories);
