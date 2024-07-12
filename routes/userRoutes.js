@@ -109,6 +109,7 @@ router.patch('/profile/picture', auth, upload.single('profilePicture'), async (r
       await req.user.save();
       res.send({ message: 'Profile picture updated', profilePicture: req.user.profilePicture });
     } catch (err) {
+        // console.error('Error updating profile picture:', err);
       res.status(500).send({ error: 'Server error' });
     }
   });
