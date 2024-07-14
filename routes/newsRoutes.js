@@ -115,41 +115,75 @@ router.patch('/admin/users/:id/toggle', adminAuth, async (req, res) => {
     }
 })
 ;
-// like a post
-router.post('/newspost/:id/like', auth, async (req, res) => {
+// // like a post
+// router.post('/newspost/:id/like', auth, async (req, res) => {
+//     try {
+//         const post = await News.findById(req.params.id);
+//         if (!post) {
+//             return res.status(404).send({ error: 'Post not found' });
+//         }
+//         if (!post.likes.includes(req.user._id)) {
+//             post.likes.push(req.user._id);
+//             post.dislikes = post.dislikes.filter(userId => !userId.equals(req.user._id));
+//         }
+//         await post.save();
+//         res.send({ message: 'Post liked', post });
+//     } catch (err) {
+//         res.status(500).send({ error: 'Server error' });
+//     }
+// });
+
+// // Dislike a post
+// router.post('/newspost/:id/dislike', auth, async (req, res) => {
+//     try {
+//         const post = await News.findById(req.params.id);
+//         if (!post) {
+//             return res.status(404).send({ error: 'Post not found' });
+//         }
+//         if (!post.dislikes.includes(req.user._id)) {
+//             post.dislikes.push(req.user._id);
+//             post.likes = post.likes.filter(userId => !userId.equals(req.user._id));
+//         }
+//         await post.save();
+//         res.send({ message: 'Post disliked', post });
+//     } catch (err) {
+//         res.status(500).send({ error: 'Server error' });
+//     }
+// });
+
+// Like or Dislike a post
+router.post('/newspost/:id/react', auth, async (req, res) => {
+    const { action } = req.body; // action should be 'like' or 'dislike'
+
+    if (!['like', 'dislike'].includes(action)) {
+        return res.status(400).send({ error: 'Invalid action. Must be "like" or "dislike".' });
+    }
+
     try {
         const post = await News.findById(req.params.id);
         if (!post) {
             return res.status(404).send({ error: 'Post not found' });
         }
-        if (!post.likes.includes(req.user._id)) {
-            post.likes.push(req.user._id);
-            post.dislikes = post.dislikes.filter(userId => !userId.equals(req.user._id));
+
+        if (action === 'like') {
+            if (!post.likes.includes(req.user._id)) {
+                post.likes.push(req.user._id);
+                post.dislikes = post.dislikes.filter(userId => !userId.equals(req.user._id));
+            }
+        } else if (action === 'dislike') {
+            if (!post.dislikes.includes(req.user._id)) {
+                post.dislikes.push(req.user._id);
+                post.likes = post.likes.filter(userId => !userId.equals(req.user._id));
+            }
         }
+
         await post.save();
-        res.send({ message: 'Post liked', post });
+        res.send({ message: `Post ${action}d`, post });
     } catch (err) {
         res.status(500).send({ error: 'Server error' });
     }
 });
 
-// Dislike a post
-router.post('/newspost/:id/dislike', auth, async (req, res) => {
-    try {
-        const post = await News.findById(req.params.id);
-        if (!post) {
-            return res.status(404).send({ error: 'Post not found' });
-        }
-        if (!post.dislikes.includes(req.user._id)) {
-            post.dislikes.push(req.user._id);
-            post.likes = post.likes.filter(userId => !userId.equals(req.user._id));
-        }
-        await post.save();
-        res.send({ message: 'Post disliked', post });
-    } catch (err) {
-        res.status(500).send({ error: 'Server error' });
-    }
-});
 
 // Mark post as favorite
 router.post('/newspost/:id/favorite', auth, async (req, res) => {
@@ -236,7 +270,7 @@ router.delete('/newspost/:postId/comment/:commentId', auth, async (req, res) => 
 // Fetch all comments of a post
 router.get('/newspost/:postId/comments', auth, async (req, res) => {
     try {
-        const post = await News.findById(req.params.postId).populate('comments.user', 'name email');
+        const post = await News.findById(req.params.postId).populate('comments.user', 'name');
         if (!post) {
             return res.status(404).send({ error: 'Post not found' });
         }
