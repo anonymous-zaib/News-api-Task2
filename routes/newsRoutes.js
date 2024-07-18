@@ -54,7 +54,7 @@ router.get('/category/:categoryId', async (req, res) => {
 });
 
 // Update News (Admin Only)
-router.patch('/updatenews:id', adminAuth, async (req, res) => {
+router.patch('/updatenews/:id', adminAuth, async (req, res) => {
     const updates = Object.keys(req.body);
     const allowedUpdates = ['title', 'content', 'category'];
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
@@ -78,7 +78,7 @@ router.patch('/updatenews:id', adminAuth, async (req, res) => {
 });
 
 // Delete News (Admin Only)
-router.delete('/deletenews:id', adminAuth, async (req, res) => {
+router.delete('/deletenews/:id', adminAuth, async (req, res) => {
     try {
         const news = await News.findByIdAndDelete(req.params.id);
         if (!news) {
