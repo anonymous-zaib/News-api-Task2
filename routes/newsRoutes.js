@@ -303,16 +303,22 @@ router.post('/newspost/:postId/report', auth, async (req, res) => {
 // Admin view reported posts
 router.get('/reports', adminAuth, async (req, res) => {
     try {
-        const reports = await News.find({ 'reports.0': { $exists: true } })
+        const report = await News.findOne({ 'reports.0': { $exists: true } })
             .populate('reports.reportedBy', 'name email')
             .populate('author', 'name email')
-            .populate('category', 'name');
+            .populate('category', 'name')
+            .exec();
 
-        res.send(reports);
+        if (!report) {
+            return res.status(404).send({ error: 'No reports found' });
+        }
+
+        res.send(report);
     } catch (err) {
         res.status(500).send({ error: 'Server error' });
     }
 });
+
 
 router.post('/sharepost/:postId', auth, async (req, res) => {
     try {
