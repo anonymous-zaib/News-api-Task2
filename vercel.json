@@ -1,0 +1,21 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "index.js",
+        "use": "@vercel/node"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/index.js"
+      }
+    ],
+    "env": {
+      "MONGODB_URI": "mongodb://localhost:27017/",
+      "FIREBASE_CONFIG": "gs://newsapi-b3ca9.appspot.com",
+      "JWT_SECRET_KEY": "zaib1234"
+    }
+  }
+  
