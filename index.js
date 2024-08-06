@@ -5,14 +5,13 @@ const categoryRoute = require('./routes/categoryRoutes')
 const newsRoute = require('./routes/newsRoutes')
 const cors = require('cors')
 
-
 const app = express()
 require("dotenv").config();
 require("./db")
 const PORT = 3000;
 app.use(express.json());
 app.use(cors({
-    origin: ["http://localhost:5173"]  
+    origin: ["http://localhost:3000"]  
 }))
 app.use(bodyParser.json());
 app.use('/users', userRoute);
