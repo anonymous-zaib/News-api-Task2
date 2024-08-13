@@ -152,7 +152,7 @@ router.patch('/admin/users/:id/toggle', adminAuth, async (req, res) => {
 // });
 
 // Like or Dislike a post
-router.post('/newspost/:id/react', async (req, res) => {
+router.post('/newspost/:id/react', auth, async (req, res) => {
     const { action } = req.body; // action should be 'like' or 'dislike'
 
     if (!['like', 'dislike'].includes(action)) {
