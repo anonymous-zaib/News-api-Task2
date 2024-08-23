@@ -17,6 +17,11 @@ router.get('/', (req, res) => {
 router.post('/register', async (req, res) => {
     try {
         const { name, email, password } = req.body;
+         // Check if the email already exists
+         const existingUser = await User.findOne({ email });
+         if (existingUser) {
+             return res.status(400).send({ error: "Email is already taken", status: false });
+         }
         const user = new User({ name, email, password });
         await user.save();
         res.status(201).send({ user, message: "user created successfully" });
